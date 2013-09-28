@@ -1,5 +1,8 @@
+CPPFLAGS=-Wall
+
+BINARIES=spn
 
 all: spn
 
 clean:
-	rm -f *.o
+	rm -f *.o $(BINARIES)
