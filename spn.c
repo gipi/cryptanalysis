@@ -23,6 +23,26 @@ char sbox(uint8_t input) {
     return sbox_matrix[input];
 }
 
+static const uint8_t permutation_matrix[0x10] = {
+    0x00, 0x04, 0x08, 0x0a,
+    0x01, 0x05, 0x09, 0x0d,
+    0x02, 0x06, 0x0a, 0x0e,
+    0x03, 0x07, 0x0b, 0x0f
+};
+
+uint16_t permutation(uint16_t input) {
+    uint16_t output;
+
+    int cycle;
+    for (cycle = 0 ; cycle < 0x10 ; cycle++) {
+        // is bit set?
+        int is = (1 << cycle) & input;
+        if (is)
+            output |= 1 << permutation_matrix[cycle];
+    }
+
+    return output;
+}
 
 uint16_t four_sboxes(uint16_t input) {
         uint16_t
