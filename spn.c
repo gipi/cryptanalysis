@@ -54,6 +54,16 @@ uint16_t four_sboxes(uint16_t input) {
         return result;
 }
 
+uint16_t complete_round(uint16_t input, uint16_t key) {
+    input ^= key;
+
+    return permutation(four_sboxes(input));
+}
+
+uint16_t last_round(uint16_t input, uint16_t key) {
+    return four_sboxes(input ^ key);
+}
+
 int main(int argc, char* argv[]) {
     int isRunning = 1;
     uint16_t input;
