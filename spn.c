@@ -4,6 +4,7 @@
  * We have four rounds with 5 subkey mixing steps.
  */
 #include<stdio.h>
+#include<stdlib.h>
 #include<unistd.h>
 #include<inttypes.h>
 #include<assert.h>
@@ -64,9 +65,24 @@ uint16_t last_round(uint16_t input, uint16_t key) {
     return four_sboxes(input ^ key);
 }
 
+void usage(char* progname) {
+    fprintf(stderr,
+        "usage: %s -key <80bits key>\n\n"
+        "crypt the stdin"
+        , progname);
+}
+
 int main(int argc, char* argv[]) {
     int isRunning = 1;
     uint16_t input;
+    // the key is 64bit, i.e. 8 bytes
+    uint64_t key  = 0x0000000000000000;
+    uint16_t key_tail = 0x0000;
+
+    if (argc < 2) {
+        usage(argv[0]);
+        exit(1);
+    }
 
     while (isRunning) {
         int n = read(0, &input, 2);
@@ -86,7 +102,18 @@ int main(int argc, char* argv[]) {
                 break;
         }
 
-        uint16_t result = four_sboxes(input);
+        int round;
+        uint16_t result;
+        uint64_t mask = 0x000000000000ffff;
+        for (round = 0 ; round < 3 ; round++) {
+            uint16_t subkey = key & mask;
+
+            result = complete_round(input, subkey);
+
+            mask <<= 16;
+        }
+
+        result = last_round(input, key_tail);
 
         write(1, &result, 2);
     }
