@@ -5,11 +5,12 @@
  */
 #include<stdio.h>
 #include<unistd.h>
+#include<inttypes.h>
 #include<assert.h>
 
 #define BUF_SIZE 256
 
-const char sbox_matrix[0x10] = {
+static const uint8_t sbox_matrix[0x10] = {
     0x0e, 0x04, 0x0d, 0x01,
     0x02, 0x0f, 0x0b, 0x08,
     0x03, 0x0a, 0x06, 0x0c,
@@ -22,17 +23,26 @@ char sbox(uint8_t input) {
     return sbox_matrix[input];
 }
 
-int main(int argc, char* argv[]) {
-    char buffer[BUF_SIZE];
 
-    int n = 0;
+uint16_t four_sboxes(uint16_t input) {
+        uint16_t
+        result = sbox(input & 0x000f);
+        result |= sbox((input & 0x00f0) >> 4) << 4;
+        result |= sbox((input & 0x0f00) >> 8) << 8;
+        result |= sbox((input & 0xf000) >> 12) << 12;
+
+        return result;
+}
+
+int main(int argc, char* argv[]) {
     int isRunning = 1;
+    uint16_t input;
 
     while (isRunning) {
-        n = read(0, buffer, 1);
+        int n = read(0, &input, 2);
 
         /*
-         * We are reading one bit at times, so we can have only three
+         * We are reading one/two bits at times, so we can have only three
          * outcomes: error, eof or correct read.
          */
         switch (n) {
@@ -42,17 +52,13 @@ int main(int argc, char* argv[]) {
                 isRunning = 0;
                 continue;
                 break;
-            case 1:
+            default:
                 break;
         }
 
-        
+        uint16_t result = four_sboxes(input);
 
-        char
-        result = sbox(buffer[0] & 0x0f);
-        result |= sbox(buffer[0] >> 4) << 4;
-
-        write(1, &result, 1);
+        write(1, &result, 2);
     }
 
     return 0;
