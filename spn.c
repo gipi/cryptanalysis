@@ -32,7 +32,7 @@ static const uint8_t permutation_matrix[0x10] = {
 };
 
 uint16_t permutation(uint16_t input) {
-    uint16_t output;
+    uint16_t output = 0;
 
     int cycle;
     for (cycle = 0 ; cycle < 0x10 ; cycle++) {
@@ -74,7 +74,7 @@ void usage(char* progname) {
 
 int main(int argc, char* argv[]) {
     int isRunning = 1;
-    uint16_t input;
+    uint16_t input = 0;
     // the key is 64bit, i.e. 8 bytes
     uint64_t key  = 0x0000000000000000;
     uint16_t key_tail = 0x0000;
