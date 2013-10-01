@@ -75,14 +75,25 @@ void usage(char* progname) {
 int main(int argc, char* argv[]) {
     int isRunning = 1;
     uint16_t input = 0;
-    // the key is 64bit, i.e. 8 bytes
+    // the key is 80bit, i.e. 8 bytes
     uint64_t key  = 0x0000000000000000;
     uint16_t key_tail = 0x0000;
 
-    if (argc < 2) {
+    if (argc < 3) {
         usage(argv[0]);
         exit(1);
     }
+
+    /*
+     * since the 80 bits key can't fit into a primitive datatype
+     * we split it into two part
+     */
+    char* original_key = argv[2];
+    // jump to the tail (take into account the "0x" part)
+    sscanf(original_key + 16 + 2, "%hx", &key_tail);
+
+    original_key[18] = '\0';
+    sscanf(original_key, "0x%016llx", &key);
 
     while (isRunning) {
         int n = read(0, &input, 2);
