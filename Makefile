@@ -2,7 +2,7 @@ CPPFLAGS=-Wall
 
 BINARIES=spn
 
-all: spn
+all: $(BINARIES)
 
 clean:
 	rm -f *.o $(BINARIES)
