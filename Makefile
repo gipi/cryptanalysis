@@ -1,6 +1,6 @@
 CPPFLAGS=-Wall
 
-BINARIES=spn
+BINARIES=spn tweetcypher
 
 all: $(BINARIES)
 
